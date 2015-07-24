@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/list_item_vertical_padding"
+    android:paddingTop="@dimen/list_item_vertical_padding"
+    android:paddingLeft="@dimen/list_item_horizontal_padding"
+    android:paddingRight="@dimen/list_item_horizontal_padding"
+    android:background="@drawable/search_results_selector">
+
+    <ImageView
+        android:id="@+id/thumbnail_image_view"
+        android:layout_width="@dimen/small_thumbnail_width_height"
+        android:layout_height="@dimen/small_thumbnail_width_height"
+        android:contentDescription="@string/artist_thumbnail"/>
+
+
+    <TextView
+        android:id="@+id/artist_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/list_item_text_view_section_margin_left"
+        android:layout_marginLeft="@dimen/list_item_text_view_section_margin_left"
+        android:layout_gravity="center_vertical"
+        android:text="@string/artist"/>
+
+</LinearLayout>

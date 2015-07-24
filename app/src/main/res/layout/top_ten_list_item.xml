@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/list_item_vertical_padding"
+    android:paddingTop="@dimen/list_item_vertical_padding"
+    android:paddingLeft="@dimen/list_item_horizontal_padding"
+    android:paddingRight="@dimen/list_item_horizontal_padding"
+    android:baselineAligned="false"
+    android:background="@drawable/track_selector">
+
+    <ImageView
+        android:id="@+id/thumbnail_image_view"
+        android:layout_width="@dimen/small_thumbnail_width_height"
+        android:layout_height="@dimen/small_thumbnail_width_height"
+        android:contentDescription="@string/album_thumbnail"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/list_item_text_view_section_margin_left"
+        android:layout_marginLeft="@dimen/list_item_text_view_section_margin_left">
+
+        <TextView
+            android:id="@+id/album_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="@string/album"/>
+
+        <TextView
+            android:id="@+id/track_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/track"/>
+    </LinearLayout>
+
+</LinearLayout>

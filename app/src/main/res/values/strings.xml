@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Spotify Streamer Stage 2</string>
+    <string name="top_ten_activity">Top Tracks</string>
+    <string name="track_player_activity">Now Playing</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="track">Track</string>
+    <string name="play_pause_track">Play/Pause Track</string>
+    <string name="next_track">Next Track</string>
+    <string name="prev_track">Previous Track</string>
+
+    <string name="search_artist_hint">Search artist...</string>
+    <string name="artist_thumbnail">Artist Thumbnail</string>
+    <string name="album_thumbnail">Album Thumbnail</string>
+
+    <!-- Toast errors-->
+    <string name="toast_artist_not_found">Artist not found, please refine search.</string>
+    <string name="toast_server_error">Server error, please try again later.</string>
+
+</resources>
