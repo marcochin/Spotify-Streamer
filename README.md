@@ -4,7 +4,7 @@ Android: An app that is able to search for artists, view their top tracks, and p
 <ul>
 <li>Compiles a Spotify Wrapper Library that allows intuitive and easy access to Spotify Api for search and locating artist's songs.</li>
 <li>Uses Picasso Library to load images asynchronously</li>
-<li>Incorportates a Master Detail Flow for better use of space on tablets and compactness in phones.</li>
+<li>Incorporates a Master Detail Flow for better use of space on tablets and compactness in phones.</li>
 <li>Implements Android's <code>MediaPlayer</code> Api for starting, stopping, and seeking tracks of an artist in accordance with its state machine</li>
 </ul>
 ***
