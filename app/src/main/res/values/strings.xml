@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Spotify Streamer Stage 2</string>
+    <string name="app_name">Spotify Streamer</string>
     <string name="top_ten_activity">Top Tracks</string>
     <string name="track_player_activity">Now Playing</string>
 

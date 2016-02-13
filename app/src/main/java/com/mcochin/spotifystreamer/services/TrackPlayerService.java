@@ -43,13 +43,13 @@ public class TrackPlayerService extends Service {
 
     @Override
     public void onCreate() {
-        mMediaPlayer = new MediaPlayer();
+        initMediaPlayer();
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        setupMediaPlayer(intent.getStringExtra(EXTRA_TRACK_PREVIEW_URL));
+        setDataAndPrepareTrack(intent.getStringExtra(EXTRA_TRACK_PREVIEW_URL));
         return START_NOT_STICKY;
     }
 
@@ -80,7 +80,8 @@ public class TrackPlayerService extends Service {
     /**
      * Sets up the MediaPlayer and starts playing on service creation
      */
-    private void setupMediaPlayer(String mediaPath){
+    private void initMediaPlayer(){
+        mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -103,25 +104,27 @@ public class TrackPlayerService extends Service {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 showPlayButton();
+                mMediaPlayer.seekTo(0);
                 resetTime();
             }
         });
 
         mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
             @Override
-            public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                if(percent == 100){
+            public void onBufferingUpdate(MediaPlayer mp, int bufferPercent) {
+                if (bufferPercent == 100) {
                     hideProgressWheel();
                     return;
                 }
 
-                if(mTrackPlayerFragment != null){
+                if (mTrackPlayerFragment != null) {
                     SeekBar seekBar = mTrackPlayerFragment.getSeekBar();
-                    int songProgress = seekBar.getProgress()/seekBar.getMax();
+                    int songProgressPercent = seekBar.getProgress() / seekBar.getMax();
 
-                    if(percent > songProgress){
+                    // If song buffers past the songs current position then hide progress wheel
+                    if (bufferPercent > songProgressPercent) {
                         hideProgressWheel();
-                    }else {
+                    } else {
                         showProgressWheel();
                     }
                 }
@@ -131,7 +134,7 @@ public class TrackPlayerService extends Service {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                switch(extra){
+                switch (extra) {
                     case MediaPlayer.MEDIA_ERROR_IO:
                     case MediaPlayer.MEDIA_ERROR_MALFORMED:
                     case MediaPlayer.MEDIA_ERROR_UNSUPPORTED:
@@ -140,7 +143,7 @@ public class TrackPlayerService extends Service {
                         break;
                 }
 
-                if(what == MediaPlayer.MEDIA_ERROR_SERVER_DIED){
+                if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
                     showServerErrorToast();
                 }
 
@@ -148,15 +151,16 @@ public class TrackPlayerService extends Service {
                 return false;
             }
         });
-
-        setDataAndPrepareTrack(mediaPath);
     }
 
     public void setDataAndPrepareTrack(String mediaPath){
-        showProgressWheel();
         try {
+            showProgressWheel();
+            mMediaPlayerPrepared = false;
+            mMediaPlayer.reset();
             mMediaPlayer.setDataSource(mediaPath);
             mMediaPlayer.prepareAsync();
+
         } catch(IOException | IllegalStateException | IllegalArgumentException | SecurityException e){
             Log.e(TAG, e.getMessage() + "\n" + Log.getStackTraceString(e));
         }
@@ -182,13 +186,13 @@ public class TrackPlayerService extends Service {
 
     private void showProgressWheel(){
         if(mTrackPlayerFragment != null){
-            mTrackPlayerFragment.showProgessWheel();
+            mTrackPlayerFragment.showProgressWheel();
         }
     }
 
     private void hideProgressWheel(){
         if(mTrackPlayerFragment != null){
-            mTrackPlayerFragment.hideProgessWheel();
+            mTrackPlayerFragment.hideProgressWheel();
         }
     }
 
@@ -230,10 +234,6 @@ public class TrackPlayerService extends Service {
         return mMediaPlayerPrepared;
     }
 
-    public void setMediaPlayerPrepared(boolean mediaPlayerPrepared){
-        mMediaPlayerPrepared = mediaPlayerPrepared;
-    }
-
     /**
      * A background task to update current position of the song
      */
@@ -244,21 +244,20 @@ public class TrackPlayerService extends Service {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            int currentPosition = mMediaPlayer.getCurrentPosition();
-            mSeconds = TimeConverter.convertMilliToSec(currentPosition);
-            publishProgress(mSeconds);
+            mSeconds = TimeConverter.convertMilliToSec(mMediaPlayer.getCurrentPosition());
+            onProgressUpdate(mSeconds);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try{
                 while(mMediaPlayer != null && mMediaPlayer.isPlaying() ){
-                    int currentPosition = mMediaPlayer.getCurrentPosition();
+                    int currentPositionMilli = mMediaPlayer.getCurrentPosition();
 
-                    //If start Position is 2000, then it will increment if current position is >= 3000
+                    // If start Position is 2000, then it will increment if current position is >= 3000
                     // then at 3000 it will increment, if current position >= 4000, etc.
-                    if(currentPosition >= ((mSeconds + 1) * TimeConverter.SECONDS)) {
-                        mSeconds = TimeConverter.convertMilliToSec(currentPosition);
+                    if(currentPositionMilli >= ((mSeconds + 1) * TimeConverter.SECONDS)) {
+                        mSeconds = TimeConverter.convertMilliToSec(currentPositionMilli);
                         publishProgress(mSeconds);
                     }
                 }
