@@ -68,6 +68,7 @@ public class TrackPlayerFragment extends DialogFragment implements View.OnClickL
 
     private MediaPlayer mMediaPlayer;
     private TrackPlayerService mTrackPlayerService;
+    private boolean mDeviceRotatedOnTablet;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,7 +137,6 @@ public class TrackPlayerFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.media_next_track_button).setOnClickListener(this);
 
         if (savedInstanceState == null) {
-            showProgressWheel();
             startTrackPlayerService(mCurrentTrackPosition);
 
         } else {
@@ -169,14 +169,15 @@ public class TrackPlayerFragment extends DialogFragment implements View.OnClickL
     @Override
     public void onResume() {
         super.onResume();
+        mDeviceRotatedOnTablet = false;
 
-        //bind service on resume
+        // Bind service on resume
         getActivity().bindService(
                 new Intent(getActivity(), TrackPlayerService.class),
                 this,
                 Context.BIND_AUTO_CREATE);
 
-        //for tablets (sizing the dialog)
+        // For tablets (sizing the dialog)
         if (getDialog() != null) {
             int screenWidth = (int) getResources().getDimension(R.dimen.track_player_dialog_width);
             int screenHeight = (int) getResources().getDimension(R.dimen.track_player_dialog_height);
@@ -187,15 +188,21 @@ public class TrackPlayerFragment extends DialogFragment implements View.OnClickL
     @Override
     public void onStop() {
         super.onStop();
+        mDeviceRotatedOnTablet = true;
 
         //cleanup and unbind service
         mTrackPlayerService.unsetTrackPlayerFragment();
         getActivity().unbindService(this);
     }
 
-    @Override // This is called only when this fragment is shown as a dialog
+    // This is called only when this fragment is shown as a dialog
+    // onDismiss is called after onStop when device is rotated
+    // onDismiss is called before onStop if dismissing w/o rotating device.
+    @Override
     public void onDismiss(DialogInterface dialog) {
-        getActivity().stopService(new Intent(getActivity(), TrackPlayerService.class));
+        if(!mDeviceRotatedOnTablet) {
+            getActivity().stopService(new Intent(getActivity(), TrackPlayerService.class));
+        }
         super.onDismiss(dialog);
     }
 
@@ -323,6 +330,9 @@ public class TrackPlayerFragment extends DialogFragment implements View.OnClickL
      * Starts the TrackPlayerService class and automatically plays the track
      */
     private void startTrackPlayerService(int trackPosition) {
+        // Need to show progress wheel here because service is not yet connected
+        // Therefore it can't notify us to showProgressWheel.
+        showProgressWheel();
         TopTenItem currentTrackItem = mTopTenItemList.get(trackPosition);
 
         Intent intent = new Intent(getActivity(), TrackPlayerService.class);
